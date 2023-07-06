@@ -17,7 +17,7 @@ app.get('/get-name', (req, res) => {
 
         // caso haja erro:
         if (err) {
-            
+
             // resposta no console ao erro
             console.error('Erro ao ler o arquivo:', err);
 
@@ -49,14 +49,20 @@ app.post('/send-name', (req, res) => {
 
         // o err recebe erro, caso haja. o data recebe o conteudo do arquivo names.js(o filePath)
         if (err) {
-
-            //  resposta ao erro
+            // resposta ao erro
             console.error('Erro ao ler o arquivo:', err);
             res.status(500).json({ error: 'Erro ao ler o arquivo' });
             return;
         }
 
         const names = JSON.parse(data);
+
+        // Verificar se já existe um objeto com o mesmo ID
+        const existingPost = names.find(post => post.id === id);
+        if (existingPost) {
+            res.status(400).json({ error: 'ID já existe' });
+            return;
+        }
 
         // insere o POST no final do documento
         names.push(newPost);
@@ -68,8 +74,34 @@ app.post('/send-name', (req, res) => {
                 // resposta negativa
                 res.status(500).json({ error: 'Erro ao salvar o arquivo' });
             } else {
-                // resposta positiva ao metodo
+                // resposta positiva ao método
                 res.json({ message: 'Post criado com sucesso' });
+            }
+        });
+    });
+});
+
+app.delete('/delete-name', (req, res) => {
+    const { id } = req.body;
+
+    fs.readFile(filePath, 'utf8', (err, data) => {
+        if (err) {
+            console.error('Erro ao ler o arquivo:', err);
+            res.status(500).json({ error: 'Erro ao ler o arquivo' });
+            return;
+        }
+
+        let names = JSON.parse(data);
+
+        // Filtra os objetos com IDs diferentes do ID fornecido
+        names = names.filter((name) => name.id !== id);
+
+        fs.writeFile(filePath, JSON.stringify(names), (err) => {
+            if (err) {
+                console.error('Erro ao salvar o arquivo:', err);
+                res.status(500).json({ error: 'Erro ao salvar o arquivo' });
+            } else {
+                res.json({ message: 'Objeto deletado com sucesso' });
             }
         });
     });
