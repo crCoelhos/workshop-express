@@ -17,8 +17,10 @@ app.get('/get-name', (req, res) => {
 
         // caso haja erro:
         if (err) {
+            
             // resposta no console ao erro
             console.error('Erro ao ler o arquivo:', err);
+
             //  resposta ao erro
             res.status(500).json({ error: 'Erro ao ler o arquivo' });
         }
@@ -44,13 +46,15 @@ app.post('/send-name', (req, res) => {
     const newPost = { id, nome };
 
     fs.readFile(filePath, 'utf8', (err, data) => {
+
+        // o err recebe erro, caso haja. o data recebe o conteudo do arquivo names.js(o filePath)
         if (err) {
+
+            //  resposta ao erro
             console.error('Erro ao ler o arquivo:', err);
             res.status(500).json({ error: 'Erro ao ler o arquivo' });
             return;
         }
-
-
 
         const names = JSON.parse(data);
 
